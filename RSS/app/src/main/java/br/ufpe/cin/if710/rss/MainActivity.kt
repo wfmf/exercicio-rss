@@ -4,7 +4,10 @@ import android.app.Activity
 import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.View.GONE
+import android.widget.ArrayAdapter
+import android.widget.BaseAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -12,7 +15,8 @@ import java.io.IOException
 import java.net.URL
 
 class MainActivity : Activity() {
-    private val feedUrl = "http://pox.globo.com/rss/g1/tecnologia/"
+    private val feedUrl = "http://pox.globo.com/rss/g1/ciencia-e-saude/"
+    private var adapter = ItemRSSAdapter(listOf(), this)
 
     //OUTROS LINKS PARA TESTAR...
     //http://rss.cnn.com/rss/edition.rss
@@ -25,6 +29,9 @@ class MainActivity : Activity() {
         setContentView(R.layout.activity_main)
         conteudoRSS.layoutManager = LinearLayoutManager(this)
         conteudoRSS.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
+        // Para evitar o erro "No adapter attached; skipping layout" criei primeiro um adapter com uma
+        // lista vazia e depois que a requisição é resolvida mudo a lista associada ao adapter
+        conteudoRSS.adapter = adapter
     }
 
     override fun onStart() {
@@ -34,10 +41,11 @@ class MainActivity : Activity() {
             doAsync {
                 val rawXML = getRssFeed(feedUrl)
                 val parsedContent: List<ItemRSS> = ParserRSS.parse(rawXML)
-                // Destroi o progess indicator e inicializa o adapter
-                // com a lista de itens do RSS
+                // Esconde o progess indicator e muda a lista
+                // de itens do RSS
                 uiThread {
-                    conteudoRSS.adapter = ItemRSSAdapter(parsedContent, applicationContext)
+                    adapter.items = parsedContent
+                    // GONE faz uma view não ser visível e não tomar espaço
                     progressIndicator.visibility = GONE
                 }
             }
