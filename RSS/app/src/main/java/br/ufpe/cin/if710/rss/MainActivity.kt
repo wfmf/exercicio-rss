@@ -4,10 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.View.GONE
-import android.widget.ArrayAdapter
-import android.widget.BaseAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -15,11 +12,11 @@ import java.io.IOException
 import java.net.URL
 
 class MainActivity : Activity() {
-    private val feedUrl = "http://pox.globo.com/rss/g1/ciencia-e-saude/"
+    private var feedUrl = ""
     private var adapter = ItemRSSAdapter(listOf(), this)
 
     //OUTROS LINKS PARA TESTAR...
-    //http://rss.cnn.com/rss/edition.rss
+    //http://rss.cnn.com/rss/edition.rss // Não funciou, erro de parsing
     //http://pox.globo.com/rss/g1/brasil/
     //http://pox.globo.com/rss/g1/ciencia-e-saude/
     //http://pox.globo.com/rss/g1/tecnologia/
@@ -27,6 +24,7 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        feedUrl = getString(R.string.rssfeed)
         conteudoRSS.layoutManager = LinearLayoutManager(this)
         conteudoRSS.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
         // Para evitar o erro "No adapter attached; skipping layout" criei primeiro um adapter com uma
