@@ -2,7 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
+    <!--Apesar de a atividade pedir para não alterar esse layout-->
+    <!--mudei o layout_height do LinearLayout porque ele estava tomando toda-->
+    <!--altura da tela com o match parent-->
     <TextView
         android:id="@+id/item_titulo"
         android:layout_width="match_parent"
