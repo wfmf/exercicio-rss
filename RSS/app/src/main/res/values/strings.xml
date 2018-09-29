@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">RSS</string>
-    <string name="rssfeed">http://pox.globo.com/rss/g1/brasil/</string>
+    <string name="rss_url_key">br.ufpe.cin.if710.rss.RSS_URL</string>
+    <string name="title_activity_prefs_menu">PrefsMenuActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="pref_section_name">Configurações</string>
 </resources>
