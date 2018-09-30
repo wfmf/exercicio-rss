@@ -21,7 +21,6 @@ class SQLiteRSSHelper private constructor(
                         ITEM_DESC to TEXT + NOT_NULL,
                         ITEM_LINK to TEXT + NOT_NULL,
                         ITEM_UNREAD to INTEGER + NOT_NULL)
-        Log.d("DB", "CREATED")
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -71,12 +70,13 @@ class SQLiteRSSHelper private constructor(
 
     private fun setUnreadValue(link: String, value: Int): Boolean {
         try {
-            c.database.use {
+            val res = c.database.use {
                 update(DATABASE_TABLE, ITEM_UNREAD to value)
-                        .whereSimple("link = ?", link)
+                        .whereArgs("link = {link}", "link" to link)
                         .exec()
             }
         } catch(e: SQLException) {
+            e.printStackTrace()
             return false
         }
         return true

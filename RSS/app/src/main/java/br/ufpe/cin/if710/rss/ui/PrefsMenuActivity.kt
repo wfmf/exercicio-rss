@@ -31,7 +31,7 @@ class PrefsMenuActivity : Activity() {
 
 
             mListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-                val newValue = sharedPreferences.getString(getString(R.string.rss_url_key), "Unknown url")
+                val newValue = sharedPreferences.getString(getString(R.string.rss_url_key), "http://leopoldomt.com/if1001/g1brasil.xml")
                 mRSSFeedURL?.summary = newValue
             }
 

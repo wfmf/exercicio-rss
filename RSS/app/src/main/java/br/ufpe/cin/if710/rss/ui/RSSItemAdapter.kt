@@ -6,10 +6,12 @@ import android.content.Intent.*
 import android.net.Uri
 import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import br.ufpe.cin.if710.rss.R
+import br.ufpe.cin.if710.rss.db.database
 import br.ufpe.cin.if710.rss.model.ItemRSS
 import kotlinx.android.synthetic.main.itemlista.view.*
 
@@ -41,13 +43,16 @@ class ItemRSSAdapter(var items: List<ItemRSS> = listOf(), private val c: Context
         }
 
         override fun onClick(v: View) {
-            val i = Intent()
-            i.action = ACTION_VIEW
-            i.data = item_link
-            i.`package` = "com.android.chrome"
-            i.addCategory(CATEGORY_DEFAULT)
-            i.addCategory(CATEGORY_BROWSABLE)
-            startActivity(this.c, i, null)
+            Log.d("LINK", item_link?.toString())
+            if (c.database.markAsRead(item_link?.path.toString())) {
+                val i = Intent()
+                i.action = ACTION_VIEW
+                i.data = item_link
+                i.`package` = "com.android.chrome"
+                i.addCategory(CATEGORY_DEFAULT)
+                i.addCategory(CATEGORY_BROWSABLE)
+                startActivity(this.c, i, null)
+            }
         }
 
     }

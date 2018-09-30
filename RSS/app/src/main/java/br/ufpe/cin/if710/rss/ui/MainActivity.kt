@@ -72,7 +72,7 @@ class MainActivity : Activity() {
         try {
             feedUrl = PreferenceManager
                     .getDefaultSharedPreferences(this)
-                    .getString(getString(R.string.rss_url_key), "")
+                    .getString(getString(R.string.rss_url_key), "http://leopoldomt.com/if1001/g1brasil.xml")
             fetchRSS()
         } catch (e: IOException) {
             e.printStackTrace()
