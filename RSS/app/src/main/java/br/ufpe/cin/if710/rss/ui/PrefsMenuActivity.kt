@@ -1,4 +1,4 @@
-package br.ufpe.cin.if710.rss
+package br.ufpe.cin.if710.rss.ui
 
 import android.os.Bundle
 import android.app.Activity
@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.preference.PreferenceManager
+import br.ufpe.cin.if710.rss.R
 
 class PrefsMenuActivity : Activity() {
 
@@ -36,7 +37,7 @@ class PrefsMenuActivity : Activity() {
 
             prefs.registerOnSharedPreferenceChangeListener(mListener)
 
-            mListener?.onSharedPreferenceChanged(prefs, getString(R.string.rss_url_key ))
+            mListener?.onSharedPreferenceChanged(prefs, getString(R.string.rss_url_key))
         }
 
     }

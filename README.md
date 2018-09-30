@@ -34,3 +34,10 @@ Para entregar o exercício, responda o [formulário de entrega](https://docs.goo
 | 6 | **sim** |
 | 7 | **sim** |
 | 8 | **sim** |
+| 9 | **sim** |
+| 10 | **sim** |
+| 11 | **não** |
+| 12 | **não** |
+| 13 | **não** |
+| 14 | **não** |
+| 15 | **não** |

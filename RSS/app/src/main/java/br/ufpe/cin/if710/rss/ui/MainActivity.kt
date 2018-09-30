@@ -1,4 +1,4 @@
-package br.ufpe.cin.if710.rss
+package br.ufpe.cin.if710.rss.ui
 
 import android.app.Activity
 import android.content.Intent
@@ -6,9 +6,15 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
+import android.view.View.VISIBLE
+import br.ufpe.cin.if710.rss.util.ParserRSS
+import br.ufpe.cin.if710.rss.R
+import br.ufpe.cin.if710.rss.db.SQLiteRSSHelper
+import br.ufpe.cin.if710.rss.model.ItemRSS
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -62,6 +68,7 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
+        progressIndicator.visibility = VISIBLE
         try {
             feedUrl = PreferenceManager
                     .getDefaultSharedPreferences(this)
@@ -77,11 +84,16 @@ class MainActivity : Activity() {
         doAsync {
             val rawXML = getRssFeed(feedUrl)
             val parsedContent: List<ItemRSS> = ParserRSS.parse(rawXML)
+
+            parsedContent.forEach {
+                SQLiteRSSHelper.getInstance(applicationContext).insertItem(it)
+            }
+
             // Esconde o progess indicator e muda a lista
             // de itens do RSS
             uiThread {
                 adapter.items = parsedContent
-                conteudoRSS.adapter = adapter
+                adapter.notifyDataSetChanged()
                 // GONE faz uma view não ser visível e não tomar espaço
                 progressIndicator.visibility = GONE
             }
