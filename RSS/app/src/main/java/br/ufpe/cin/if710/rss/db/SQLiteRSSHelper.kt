@@ -46,6 +46,14 @@ class SQLiteRSSHelper private constructor(
         }
     }
 
+    fun getItems(): List<ItemRSS> = c.database.use {
+        select(DATABASE_TABLE)
+            .exec {
+                parseList(RSSItemParser())
+            }
+    }
+
+
     fun getItemRSS(link: String): ItemRSS? {
         var res: ItemRSS? = null
         try {

@@ -1,7 +1,10 @@
 package br.ufpe.cin.if710.rss.ui
 
 import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.widget.DividerItemDecoration
@@ -10,15 +13,16 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
-import android.view.View.VISIBLE
 import br.ufpe.cin.if710.rss.util.ParserRSS
 import br.ufpe.cin.if710.rss.R
 import br.ufpe.cin.if710.rss.db.SQLiteRSSHelper
+import br.ufpe.cin.if710.rss.db.database
 import br.ufpe.cin.if710.rss.model.ItemRSS
+import br.ufpe.cin.if710.rss.service.RssService
+import br.ufpe.cin.if710.rss.service.RssService.Companion.RSS_DOWNLOAD
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import java.io.IOException
 import java.net.URL
 
 //OUTROS LINKS PARA TESTAR...
@@ -43,6 +47,12 @@ class MainActivity : Activity() {
         conteudoRSS.adapter = adapter
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
         feedUrl = sharedPref.getString(getString(R.string.rss_url_key), "http://leopoldomt.com/if1001/g1brasil.xml")
+
+        handleDownloadCompleted.onReceive(this, Intent())
+
+        startService(Intent(this, RssService::class.java).apply {
+            action = DOWNLOAD_SERVICE
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -57,52 +67,28 @@ class MainActivity : Activity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onStart() {
-        super.onStart()
-        try {
-            fetchRSS()
-        } catch(e: IOException) {
-            e.printStackTrace()
-        }
-    }
-
     override fun onResume() {
+        Log.d("DB", "ON_RESUME")
         super.onResume()
-        progressIndicator.visibility = VISIBLE
-        try {
-            feedUrl = PreferenceManager
-                    .getDefaultSharedPreferences(this)
-                    .getString(getString(R.string.rss_url_key), "http://leopoldomt.com/if1001/g1brasil.xml")
-            fetchRSS()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
+        registerReceiver(this.handleDownloadCompleted, IntentFilter(RSS_DOWNLOAD))
     }
 
-    private fun fetchRSS() {
-        // Inicia tarefa assíncrona
-        doAsync {
-            val rawXML = getRssFeed(feedUrl)
-            val parsedContent: List<ItemRSS> = ParserRSS.parse(rawXML)
-
-            parsedContent.forEach {
-                SQLiteRSSHelper.getInstance(applicationContext).insertItem(it)
-            }
-
-            // Esconde o progess indicator e muda a lista
-            // de itens do RSS
-            uiThread {
-                adapter.items = parsedContent
-                adapter.notifyDataSetChanged()
-                // GONE faz uma view não ser visível e não tomar espaço
-                progressIndicator.visibility = GONE
-            }
-        }
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(this.handleDownloadCompleted)
     }
 
-    // Forma bem simples de fazer requisição com
-    // extension functions de Kotlin
-    private fun getRssFeed(feed: String): String {
-        return URL(feed).readText()
+    private val handleDownloadCompleted = object: BroadcastReceiver() {
+        override fun onReceive(ctx: Context?, i: Intent?) {
+            doAsync {
+                val feedItems = ctx?.database?.getItems()
+                uiThread {
+                    if (feedItems != null) {
+                        adapter.items = feedItems
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+            }
+        }
     }
 }
